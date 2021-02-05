@@ -83,8 +83,8 @@ def is_lat_degree_minute_seconds_valid(df):
 def is_distance_from_intersection_valid(df):
     road_character = df.road_character.fillna(0)
     distance_from_intersection = df.distance_from_intersection.astype('float64').fillna(0.0)
-    is_dist_right_for_road_char_0 = road_character == 0 & (distance_from_intersection) > 0.0
-    is_dist_right_for_road_char_1 = road_character != 0 & (distance_from_intersection) == 0.0
+    is_dist_right_for_road_char_0 = (road_character == 0) & (distance_from_intersection > 0.0)
+    is_dist_right_for_road_char_1 = (road_character > 0) & (distance_from_intersection == 0.0)
     return (is_dist_right_for_road_char_0 | is_dist_right_for_road_char_1).all()
 
 def is_all_serial_county_year_combination_unique(df):
@@ -190,11 +190,10 @@ def validateData():
     if not is_lat_degree_minute_seconds_valid(df):
         print("Inter Record Assertion failed for latiude")
     
-    # Distance from Intersection must = 0 when Road Character = 1
+    # Assertion 4c: Distance from Intersection must = 0 when Road Character = 1
     # And Distance from Intersection must be > 0 when Road Character is not 1
-    ### FIXME: Getting some object casting error while running this
-    # if not is_distance_from_intersection_valid(df):
-    #     print("Inter Record Assertion failed for Distance from Intersection")
+    if not is_distance_from_intersection_valid(df):
+        print("Inter Record Assertion failed for Distance from Intersection")
     
     # Assertion 5: Summary Assertion
     # Assertion 5a: Check if all participant has unique id
