@@ -109,42 +109,42 @@ def validateData():
     # Assertion 1: Existence Assertion
     # Assertion 1.a: All Records must have a record_type and the record_type should be either 1, 2 or 3
     if not is_all_record_types_valid(df):
-        raise ValueError("Existance Assertion Failed for record_type")
+        print("Existance Assertion Failed for record_type")
 
     # Assertion 1.b: All record must have a crash_id
     if not is_all_creash_id_valid(df):
-        raise ValueError("Existance Assertion Failed for crash_id")
+        print("Existance Assertion Failed for crash_id")
 
     # Assertion 2: Limit Assertion
     # Assertion 2.a: Data in Crash month field should fall with in range 1 t0 12.
     if not (is_crash_month_limit_valid(df)):
-        raise ValueError("Limit Assertion Failed for crash_month")
+        print("Limit Assertion Failed for crash_month")
 
     # Assertion 2.b: Data in Week Day Code field should fall with in range 1 t0 7.
     if not (is_week_day_code_limit_valid(df)):
-        raise ValueError("Limit Assertion Failed for week_day_code")
+        print("Limit Assertion Failed for week_day_code")
 
     # Assertion 2.c: When entered, Latitude Degrees must be a whole number between 41 and 47, inclusive
     if not (is_lat_degree_valid(df)):
-        raise ValueError("Limit Assertion Failed for latitude degree")
+        print("Limit Assertion Failed for latitude degree")
 
     # Assertion 3: Intra Record Check Assertion
     # Assertion 3a: Total Count of Persons Involved = Total Pedestrian Count + Total Pedalcyclist Count + Total Unknown Count + Total Occupant Count.
     if not is_total_person_involved_count_valid(df):
-        raise ValueError("Intra Record Assertion failed for Total Persons Count")
+        print("Intra Record Assertion failed for Total Persons Count")
 
     # Assertion 3b: Total Un-Injured Persons Count = total number of persons involved - the number of persons injured - the number of persons killed
     if not is_total_uninjured_count_valid(df):
-        raise ValueError("Intra Record Assertion failed for Total Un-Injured Persons Count")
+        print("Intra Record Assertion failed for Total Un-Injured Persons Count")
     
     # Assertion 4: Inter Record Check Assertion
-    # Assertion 4a: Total crash should not vary more than 50% month on mpnth
+    # Assertion 4a: Total crash should not vary more than 50% month on month
     # TODO
 
     # Assertion 4b: Latitude Minutes must be null when Latitude Degrees is null
     # And Latitude Seconds must be null when Latitude Degrees is null
     if not is_lat_degree_minute_seconds_valid(df):
-        raise ValueError("Inter Record Assertion failed for latiude")
+        print("Inter Record Assertion failed for latiude")
     
     # Distance from Intersection must = 0 when Road Character = 1
     # And Distance from Intersection must be > 0 when Road Character is not 1
@@ -152,16 +152,16 @@ def validateData():
     # Assertion 5: Summary Assertion
     # Assertion 5a: Check if all participant has unique id
     if not (is_all_participant_id_unique(df)):
-        raise ValueError("Summary Assertion Failed for unique participant id")
+        print("Summary Assertion Failed for unique participant id")
 
     # Assertion 5b: Combination of Serial number + County + Year is unique
     if not (is_all_serial_county_year_combination_unique(df)):
-        raise ValueError("Summary Assertion Failed for unique Serial number + County + Year combination")
+        print("Summary Assertion Failed for unique Serial number + County + Year combination")
 
     # Assertion 6: Referential Integrity Assertion
     # Assertion 6a: Each participant id has a crash id
     if not is_all_participant_id_has_crash_id(df):
-        raise ValueError("Referential integrity Assertion Failed for participant_id:crash_id")
+        print("Referential integrity Assertion Failed for participant_id:crash_id")
 
     # Assertion 6b: Every crash has a known lat long location
     # TODO
