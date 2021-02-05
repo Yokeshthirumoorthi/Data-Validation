@@ -126,6 +126,16 @@ def is_total_person_involved_count_valid(df):
     total_vehicle_occupant_count=df['total_vehicle_occupant_count'].fillna(0)
     return (total_person_involved_count == total_pedestrian_count + total_pedalcyclist_count + total_unknown_non_motorist_count + total_vehicle_occupant_count).all()
 
+def is_crash_count_per_month_consistant(df):
+    # group crashes by crash month and count the crash ids in each group
+    crash_count_per_month_df = df.groupby(['crash_month'])['crash_id'].agg(['count'])
+    crash_count_per_month = crash_count_per_month_df['count']
+    percentile_10 = crash_count_per_month.quantile(0.1)
+    percentile_90 = crash_count_per_month.quantile(0.9)
+    mean = crash_count_per_month.mean()
+    # check variation for more than 50%
+    return (percentile_10 > (mean / 2)) & (mean > (percentile_90 / 2))
+
 def is_crash_month_normally_distributed(id):
     # skewness of normal distribution should be 0. I am giving a tolerance range of .25
     return df.crash_month.skew() < 0.25
@@ -172,7 +182,8 @@ def validateData():
     
     # Assertion 4: Inter Record Check Assertion
     # Assertion 4a: Total crash should not vary more than 50% month on month
-    # TODO
+    if not is_crash_count_per_month_consistant(df):
+        print("Inter Record Assertion failed for total crash")
 
     # Assertion 4b: Latitude Minutes must be null when Latitude Degrees is null
     # And Latitude Seconds must be null when Latitude Degrees is null
