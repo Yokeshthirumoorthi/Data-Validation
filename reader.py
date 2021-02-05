@@ -46,6 +46,9 @@ def is_crash_month_limit_valid(df):
 def is_week_day_code_limit_valid(df):
     return df.week_day_code.dropna().between(SUNDAY,SATURDAY).all()
 
+def is_all_participant_id_unique(df):
+    return df.participant_id.dropna().is_unique
+
 def validateData():
     # Assertion 1: Existence Assertion
     # Assertion 1.a: All Records must have a record_type and the record_type should be either 1, 2 or 3
@@ -64,6 +67,9 @@ def validateData():
     # Assertion 2.b: Data in Week Day Code field should fall with in range 1 t0 7.
     if not (is_week_day_code_limit_valid(df)):
         raise ValueError("Limit Assertion Failed for week_day_code")
+
+    if not (is_all_participant_id_unique(df)):
+        raise ValueError("Summary Assertion Failed for unique participant id")
 
     print("All validations passed successfully")
 
