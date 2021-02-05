@@ -16,28 +16,32 @@ df=df.rename(columns={
     'Crash ID':'crash_id',
     'Record Type':'record_type',
     'Vehicle ID':'vehicle_id',
-    'Participant ID':'participant_id'
+    'Participant ID':'participant_id',
+    'Crash Month':'crash_month',
     })
 
 def numLen(num):
   return len(str(abs(num)))
 
+def chk_only_valid_record_type_exists(df):
+    return df.record_type.isin([1,2,3]).all()
+
+def chk_only_valid_crash_id_exists(df):
+    return (df.crash_id.apply(numLen) == 7).all()
+
+def chk_crash_month_limit_validity(df):
+    return df.crash_month.dropna().between(1,12).all()
+
 # Assertion 1: Existence Assertion
 # Assertion 1.a: All Records must have a record_type and the record_type should be either 1, 2 or 3
-record_type = df.record_type
-(record_type>3).any() # any record_type has value greater than 3
-(record_type<1).any() # any record_type has value lesser than 1
+print(chk_only_valid_record_type_exists(df))
 
 # Assertion 1.b: All record must have a crash_id and crash_id should be 8 digit long
-crash_id = df.crash_id
-(crash_id).isnull()
-(crash_id.apply(numLen) != 7).any()
-# (len(str(crash_id)) == 8).all()
-
+print(chk_only_valid_crash_id_exists(df))
 
 # Asssertion 2: Limit Assertion
-# Assertion 2.a: 
-
+# Assertion 2.a: Data in Crash month field should fall with in range 1 10 12.
+print(chk_crash_month_limit_validity(df))
 
 # # Seperate out crash data
 # crash_data = df[df['record_type'] == 1] 
