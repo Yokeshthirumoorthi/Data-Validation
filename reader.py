@@ -22,6 +22,7 @@ df=df.rename(columns={
     'Crash Month':'crash_month',
     'Crash Day':'crash_day',
     'Crash Year':'crash_year',
+    'Crash Hour':'crash_hour',
     'Week Day Code': 'week_day_code',
     'Latitude Seconds': 'latitude_seconds',
     'Latitude Minutes': 'latitude_minutes',
@@ -129,6 +130,14 @@ def is_crash_month_normally_distributed(id):
     # skewness of normal distribution should be 0. I am giving a tolerance range of .25
     return df.crash_month.skew() < 0.25
 
+def is_crash_hour_normally_distributed(id):
+    # Provide default hour of time for missing values
+    crash_hour = df.crash_hour.fillna(0)
+    # Replace wrong values as 0
+    crash_hour = crash_hour.mask(crash_hour > 24, 0)
+    # skewness of normal distribution should be 0. I am giving a tolerance range of .25
+    return crash_hour.skew() < 0.25
+
 def validateData():
     # Assertion 1: Existence Assertion
     # Assertion 1.a: All Records must have a record_type and the record_type should be either 1, 2 or 3
@@ -199,7 +208,9 @@ def validateData():
     if not is_crash_month_normally_distributed(df):
         print("Statistical Distribution Assertion Failed for crash month")
 
-    # Assertion 7b: TODO
+    # Assertion 7b: Crashes should be normally distributed throughout the day
+    if not is_crash_hour_normally_distributed(df):
+        print("Statistical Distribution Assertion Failed for crash hour")
 
     print("All validations passed successfully")
 
