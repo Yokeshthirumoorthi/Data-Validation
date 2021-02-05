@@ -125,6 +125,10 @@ def is_total_person_involved_count_valid(df):
     total_vehicle_occupant_count=df['total_vehicle_occupant_count'].fillna(0)
     return (total_person_involved_count == total_pedestrian_count + total_pedalcyclist_count + total_unknown_non_motorist_count + total_vehicle_occupant_count).all()
 
+def is_crash_month_normally_distributed(id):
+    # skewness of normal distribution should be 0. I am giving a tolerance range of .25
+    return df.crash_month.skew() < 0.25
+
 def validateData():
     # Assertion 1: Existence Assertion
     # Assertion 1.a: All Records must have a record_type and the record_type should be either 1, 2 or 3
@@ -191,7 +195,10 @@ def validateData():
         print("Referential integrity Assertion Failed for crash_id:latitude:longitude")
 
     # Assertion 7: Statistical Distribution Assertion
-    # Assertion 7a: TODO
+    # Assertion 7a: Crashes should be normally distributed across all months
+    if not is_crash_month_normally_distributed(df):
+        print("Statistical Distribution Assertion Failed for crash month")
+
     # Assertion 7b: TODO
 
     print("All validations passed successfully")
