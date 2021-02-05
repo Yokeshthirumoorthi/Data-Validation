@@ -57,7 +57,7 @@ def numLen(num):
 def is_all_record_types_valid(df):
     return df.record_type.isin([CRASH_RECORD_ID,VEHICLE_RECORD_ID,PERSON_RECORD_ID]).all()
 
-def is_all_creash_id_valid(df):
+def is_all_crash_id_valid(df):
     return (df.crash_id.isnull()).sum() == 0
 
 def is_crash_month_limit_valid(df):
@@ -155,7 +155,7 @@ def validateData():
         print("Existance Assertion Failed for record_type")
 
     # Assertion 1.b: All record must have a crash_id
-    if not is_all_creash_id_valid(df):
+    if not is_all_crash_id_valid(df):
         print("Existance Assertion Failed for crash_id")
 
     # Assertion 2: Limit Assertion
