@@ -49,6 +49,15 @@ def is_week_day_code_limit_valid(df):
 def is_all_participant_id_unique(df):
     return df.participant_id.dropna().is_unique
 
+def is_all_participant_id_has_crash_id(id):
+    comparable_columns = ['crash_id','participant_id']
+    # set up crash_participant_data frame
+    crash_participant_df = df[comparable_columns]
+    # remove rows with almost all missing data
+    crash_participant_df = crash_participant_df.dropna(axis = 1, how ='all', thresh=2)
+    # check if there is any null in crash id
+    return crash_participant_df.crash_id.isnull().sum() == 0
+
 def validateData():
     # Assertion 1: Existence Assertion
     # Assertion 1.a: All Records must have a record_type and the record_type should be either 1, 2 or 3
@@ -70,6 +79,9 @@ def validateData():
 
     if not (is_all_participant_id_unique(df)):
         raise ValueError("Summary Assertion Failed for unique participant id")
+
+    if not is_all_participant_id_has_crash_id(df):
+        raise ValueError("Referential integrity Assertion Failed for participant_id:crash_id")
 
     print("All validations passed successfully")
 
