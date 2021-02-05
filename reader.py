@@ -39,7 +39,7 @@ def is_all_record_types_valid(df):
     return df.record_type.isin([CRASH_RECORD_ID,VEHICLE_RECORD_ID,PERSON_RECORD_ID]).all()
 
 def is_all_creash_id_valid(df):
-    return (df.crash_id.apply(numLen) == CRASH_ID_LENGTH).all()
+    return (df.crash_id.isnull()).sum() == 0
 
 def is_crash_month_limit_valid(df):
     return df.crash_month.dropna().between(JAN,DEC).all()
@@ -68,11 +68,11 @@ def validateData():
     if not is_all_record_types_valid(df):
         raise ValueError("Existance Assertion Failed for record_type")
 
-    # Assertion 1.b: All record must have a crash_id and crash_id should be 8 digit long
+    # Assertion 1.b: All record must have a crash_id
     if not is_all_creash_id_valid(df):
         raise ValueError("Existance Assertion Failed for crash_id")
 
-    # Asssertion 2: Limit Assertion
+    # Assertion 2: Limit Assertion
     # Assertion 2.a: Data in Crash month field should fall with in range 1 t0 12.
     if not (is_crash_month_limit_valid(df)):
         raise ValueError("Limit Assertion Failed for crash_month")
@@ -85,37 +85,37 @@ def validateData():
     if not (is_lat_degree_valid(df)):
         raise ValueError("Limit Assertion Failed for latitude degree")
 
-    # Asssertion 3: Intra Record Check Assertion
-    # Asssertion 3a: Total Count of Persons Involved = Total Pedestrian Count + Total Pedalcyclist Count + Total Unknown Count + Total Occupant Count.
+    # Assertion 3: Intra Record Check Assertion
+    # Assertion 3a: Total Count of Persons Involved = Total Pedestrian Count + Total Pedalcyclist Count + Total Unknown Count + Total Occupant Count.
     # TODO
 
     # Assertion 3b: Total Un-Injured Persons Count = total number of persons involved - the number of personsinjured - the number of persons killed
     # TODO
     
-    # Asssertion 4: Inter Record Check Assertion
-    # Asssertion 4a: Total crash should not vary more than 50% month on mpnth
+    # Assertion 4: Inter Record Check Assertion
+    # Assertion 4a: Total crash should not vary more than 50% month on mpnth
     # TODO
 
-    # Asssertion 4b: Latitude Minutes must be null when Latitude Degrees is null
+    # Assertion 4b: Latitude Minutes must be null when Latitude Degrees is null
     # And Latitude Seconds must be null when Latitude Degrees is null
     # TODO
 
     # Distance from Intersection must = 0 when Road Character = 1
     # And Distance from Intersection must be > 0 when Road Character is not 1
 
-    # Asssertion 5: Summary Assertion
-    # Asssertion 5a: Check if all participant has unique id
+    # Assertion 5: Summary Assertion
+    # Assertion 5a: Check if all participant has unique id
     if not (is_all_participant_id_unique(df)):
         raise ValueError("Summary Assertion Failed for unique participant id")
 
-    # Asssertion 5b: TODO
+    # Assertion 5b: TODO
 
-    # Asssertion 6: Referential Integrity Assertion
-    # Asssertion 6a: Each participant id has a crash id
+    # Assertion 6: Referential Integrity Assertion
+    # Assertion 6a: Each participant id has a crash id
     if not is_all_participant_id_has_crash_id(df):
         raise ValueError("Referential integrity Assertion Failed for participant_id:crash_id")
 
-    # Asssertion 6b: Every crash has a known lat long location
+    # Assertion 6b: Every crash has a known lat long location
     # TODO
 
     # Assertion 7: Statistical Distribution Assertion
