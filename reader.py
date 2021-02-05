@@ -18,6 +18,8 @@ df=df.rename(columns={
     'Vehicle ID':'vehicle_id',
     'Participant ID':'participant_id',
     'Crash Month':'crash_month',
+    'Crash Day':'crash_day',
+    'Week Day Code': 'week_day_code'
     })
 
 CRASH_RECORD_ID = 1
@@ -26,6 +28,8 @@ PERSON_RECORD_ID = 3
 CRASH_ID_LENGTH = 7
 JAN = 1
 DEC = 12
+SUNDAY = 0
+SATURDAY = 7
 
 def numLen(num):
   return len(str(abs(num)))
@@ -39,6 +43,9 @@ def is_all_creash_id_valid(df):
 def is_crash_month_limit_valid(df):
     return df.crash_month.dropna().between(JAN,DEC).all()
 
+def is_week_day_code_limit_valid(df):
+    return df.week_day_code.dropna().between(SUNDAY,SATURDAY).all()
+
 def validateData():
     # Assertion 1: Existence Assertion
     # Assertion 1.a: All Records must have a record_type and the record_type should be either 1, 2 or 3
@@ -50,9 +57,13 @@ def validateData():
         raise ValueError("Existance Assertion Failed for crash_id")
 
     # Asssertion 2: Limit Assertion
-    # Assertion 2.a: Data in Crash month field should fall with in range 1 10 12.
+    # Assertion 2.a: Data in Crash month field should fall with in range 1 t0 12.
     if not (is_crash_month_limit_valid(df)):
         raise ValueError("Limit Assertion Failed for crash_month")
+
+    # Assertion 2.b: Data in Week Day Code field should fall with in range 1 t0 7.
+    if not (is_week_day_code_limit_valid(df)):
+        raise ValueError("Limit Assertion Failed for week_day_code")
 
     print("All validations passed successfully")
 
