@@ -17,8 +17,11 @@ df=df.rename(columns={
     'Record Type':'record_type',
     'Vehicle ID':'vehicle_id',
     'Participant ID':'participant_id',
+    'Serial #':'serial_no',
+    'County Code':'county_code',
     'Crash Month':'crash_month',
     'Crash Day':'crash_day',
+    'Crash Year':'crash_year',
     'Week Day Code': 'week_day_code',
     'Latitude Degrees': 'latitude_degrees'
     })
@@ -52,6 +55,13 @@ def is_week_day_code_limit_valid(df):
 
 def is_all_participant_id_unique(df):
     return df.participant_id.dropna().is_unique
+
+def is_all_serial_county_year_combination_unique(df):
+    crash_df=df[df['record_type'] == 1] 
+    serial_no=crash_df['serial_no'].astype(str)
+    county_code=crash_df['county_code'].astype(str)
+    crash_year=crash_df['crash_year'].astype(str)
+    return (serial_no + county_code + crash_year).is_unique
 
 def is_all_participant_id_has_crash_id(id):
     comparable_columns = ['crash_id','participant_id']
@@ -108,7 +118,9 @@ def validateData():
     if not (is_all_participant_id_unique(df)):
         raise ValueError("Summary Assertion Failed for unique participant id")
 
-    # Assertion 5b: TODO
+    # Assertion 5b: Combination of Serial number + County + Year is unique
+    if not (is_all_serial_county_year_combination_unique(df)):
+        raise ValueError("Summary Assertion Failed for unique Serial number + County + Year combination")
 
     # Assertion 6: Referential Integrity Assertion
     # Assertion 6a: Each participant id has a crash id
