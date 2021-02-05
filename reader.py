@@ -29,6 +29,8 @@ df=df.rename(columns={
     'Longitude Seconds': 'longitude_seconds',
     'Longitude Minutes': 'longitude_minutes',
     'Longitude Degrees': 'longitude_degrees',
+    'Road Character': 'road_character',
+    'Distance from Intersection': 'distance_from_intersection',
     'Total Un-Injured Persons': 'total_uninjured_persons_count',
     'Total Count of Persons Involved': 'total_person_involved_count',
     'Total Non-Fatal Injury Count': 'total_non_fatal_injury_count',
@@ -76,6 +78,13 @@ def is_lat_degree_minute_seconds_valid(df):
     all_not_null = latitude_degrees.notna() & latitude_minutes.notna() & latitude_seconds.notna() 
     all_null = latitude_degrees.isnull() & latitude_minutes.isnull() & latitude_seconds.isnull() 
     return (all_not_null | all_null).all()
+
+def is_distance_from_intersection_valid(df):
+    road_character = df.road_character.fillna(0)
+    distance_from_intersection = df.distance_from_intersection.astype('float64').fillna(0.0)
+    is_dist_right_for_road_char_0 = road_character == 0 & (distance_from_intersection) > 0.0
+    is_dist_right_for_road_char_1 = road_character != 0 & (distance_from_intersection) == 0.0
+    return (is_dist_right_for_road_char_0 | is_dist_right_for_road_char_1).all()
 
 def is_all_serial_county_year_combination_unique(df):
     # set up crash_data frame
@@ -159,7 +168,10 @@ def validateData():
     
     # Distance from Intersection must = 0 when Road Character = 1
     # And Distance from Intersection must be > 0 when Road Character is not 1
-
+    ### FIXME: Getting some object casting error while running this
+    # if not is_distance_from_intersection_valid(df):
+    #     print("Inter Record Assertion failed for Distance from Intersection")
+    
     # Assertion 5: Summary Assertion
     # Assertion 5a: Check if all participant has unique id
     if not (is_all_participant_id_unique(df)):
