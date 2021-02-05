@@ -26,6 +26,9 @@ df=df.rename(columns={
     'Latitude Seconds': 'latitude_seconds',
     'Latitude Minutes': 'latitude_minutes',
     'Latitude Degrees': 'latitude_degrees',
+    'Longitude Seconds': 'longitude_seconds',
+    'Longitude Minutes': 'longitude_minutes',
+    'Longitude Degrees': 'longitude_degrees',
     'Total Un-Injured Persons': 'total_uninjured_persons_count',
     'Total Count of Persons Involved': 'total_person_involved_count',
     'Total Non-Fatal Injury Count': 'total_non_fatal_injury_count',
@@ -75,11 +78,19 @@ def is_lat_degree_minute_seconds_valid(df):
     return (all_not_null | all_null).all()
 
 def is_all_serial_county_year_combination_unique(df):
+    # set up crash_data frame
     crash_df=df[df['record_type'] == 1] 
     serial_no=crash_df['serial_no'].astype(str)
     county_code=crash_df['county_code'].astype(str)
     crash_year=crash_df['crash_year'].astype(str)
     return (serial_no + county_code + crash_year).is_unique
+
+def is_all_crash_has_known_lat_long(df):
+    # set up crash_data frame
+    crash_df=df[df['record_type'] == 1] 
+    has_lat = crash_df.latitude_degrees.notna() & crash_df.latitude_minutes.notna() & crash_df.latitude_seconds.notna() 
+    has_long = crash_df.longitude_degrees.notna() & crash_df.longitude_minutes.notna() & crash_df.longitude_seconds.notna() 
+    return (has_lat & has_long).all() 
 
 def is_all_participant_id_has_crash_id(id):
     comparable_columns = ['crash_id','participant_id']
@@ -164,7 +175,8 @@ def validateData():
         print("Referential integrity Assertion Failed for participant_id:crash_id")
 
     # Assertion 6b: Every crash has a known lat long location
-    # TODO
+    if not is_all_crash_has_known_lat_long(df):
+        print("Referential integrity Assertion Failed for crash_id:latitude:longitude")
 
     # Assertion 7: Statistical Distribution Assertion
     # Assertion 7a: TODO
