@@ -23,6 +23,8 @@ df=df.rename(columns={
     'Crash Day':'crash_day',
     'Crash Year':'crash_year',
     'Week Day Code': 'week_day_code',
+    'Latitude Seconds': 'latitude_seconds',
+    'Latitude Minutes': 'latitude_minutes',
     'Latitude Degrees': 'latitude_degrees',
     'Total Un-Injured Persons': 'total_uninjured_persons_count',
     'Total Count of Persons Involved': 'total_person_involved_count',
@@ -63,6 +65,14 @@ def is_week_day_code_limit_valid(df):
 
 def is_all_participant_id_unique(df):
     return df.participant_id.dropna().is_unique
+
+def is_lat_degree_minute_seconds_valid(df):
+    latitude_degrees = df.latitude_degrees
+    latitude_minutes = df.latitude_minutes
+    latitude_seconds = df.latitude_seconds
+    all_not_null = latitude_degrees.notna() & latitude_minutes.notna() & latitude_seconds.notna() 
+    all_null = latitude_degrees.isnull() & latitude_minutes.isnull() & latitude_seconds.isnull() 
+    return (all_not_null | all_null).all()
 
 def is_all_serial_county_year_combination_unique(df):
     crash_df=df[df['record_type'] == 1] 
@@ -133,8 +143,9 @@ def validateData():
 
     # Assertion 4b: Latitude Minutes must be null when Latitude Degrees is null
     # And Latitude Seconds must be null when Latitude Degrees is null
-    # TODO
-
+    if not is_lat_degree_minute_seconds_valid(df):
+        raise ValueError("Inter Record Assertion failed for latiude")
+    
     # Distance from Intersection must = 0 when Road Character = 1
     # And Distance from Intersection must be > 0 when Road Character is not 1
 
