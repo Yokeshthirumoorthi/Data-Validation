@@ -20,17 +20,24 @@ df=df.rename(columns={
     'Crash Month':'crash_month',
     })
 
+CRASH_RECORD_ID = 1
+VEHICLE_RECORD_ID = 2
+PERSON_RECORD_ID = 3
+CRASH_ID_LENGTH = 7
+JAN = 1
+DEC = 12
+
 def numLen(num):
   return len(str(abs(num)))
 
 def is_all_record_types_valid(df):
-    return df.record_type.isin([1,2,3]).all()
+    return df.record_type.isin([CRASH_RECORD_ID,VEHICLE_RECORD_ID,PERSON_RECORD_ID]).all()
 
 def is_all_creash_id_valid(df):
-    return (df.crash_id.apply(numLen) == 7).all()
+    return (df.crash_id.apply(numLen) == CRASH_ID_LENGTH).all()
 
 def is_crash_month_limit_valid(df):
-    return df.crash_month.dropna().between(1,12).all()
+    return df.crash_month.dropna().between(JAN,DEC).all()
 
 def validateData():
     # Assertion 1: Existence Assertion
