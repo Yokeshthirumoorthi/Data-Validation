@@ -27,7 +27,11 @@ df=df.rename(columns={
     'Total Un-Injured Persons': 'total_uninjured_persons_count',
     'Total Count of Persons Involved': 'total_person_involved_count',
     'Total Non-Fatal Injury Count': 'total_non_fatal_injury_count',
-    'Total Fatality Count': 'total_fatality_count'
+    'Total Fatality Count': 'total_fatality_count',
+    'Total Pedestrian Count': 'total_pedestrian_count',
+    'Total Pedalcyclist Count': 'total_pedalcyclist_count',
+    'Total Unknown Non-Motorist Count': 'total_unknown_non_motorist_count',
+    'Total Vehicle Occupant Count': 'total_vehicle_occupant_count'
     })
 
 CRASH_RECORD_ID = 1
@@ -83,6 +87,14 @@ def is_total_uninjured_count_valid(df):
     total_fatality_count=df['total_fatality_count'].fillna(0)
     return (total_uninjured_persons_count == total_person_involved_count - (total_non_fatal_injury_count + total_fatality_count)).all()
 
+def is_total_person_involved_count_valid(df):
+    total_person_involved_count=df['total_person_involved_count'].fillna(0)
+    total_pedestrian_count=df['total_pedestrian_count'].fillna(0)
+    total_pedalcyclist_count=df['total_pedalcyclist_count'].fillna(0)
+    total_unknown_non_motorist_count=df['total_unknown_non_motorist_count'].fillna(0)
+    total_vehicle_occupant_count=df['total_vehicle_occupant_count'].fillna(0)
+    return (total_person_involved_count == total_pedestrian_count + total_pedalcyclist_count + total_unknown_non_motorist_count + total_vehicle_occupant_count).all()
+
 def validateData():
     # Assertion 1: Existence Assertion
     # Assertion 1.a: All Records must have a record_type and the record_type should be either 1, 2 or 3
@@ -108,7 +120,8 @@ def validateData():
 
     # Assertion 3: Intra Record Check Assertion
     # Assertion 3a: Total Count of Persons Involved = Total Pedestrian Count + Total Pedalcyclist Count + Total Unknown Count + Total Occupant Count.
-    # TODO
+    if not is_total_person_involved_count_valid(df):
+        raise ValueError("Intra Record Assertion failed for Total Persons Count")
 
     # Assertion 3b: Total Un-Injured Persons Count = total number of persons involved - the number of persons injured - the number of persons killed
     if not is_total_uninjured_count_valid(df):
