@@ -19,7 +19,8 @@ df=df.rename(columns={
     'Participant ID':'participant_id',
     'Crash Month':'crash_month',
     'Crash Day':'crash_day',
-    'Week Day Code': 'week_day_code'
+    'Week Day Code': 'week_day_code',
+    'Latitude Degrees': 'latitude_degrees'
     })
 
 CRASH_RECORD_ID = 1
@@ -42,6 +43,9 @@ def is_all_creash_id_valid(df):
 
 def is_crash_month_limit_valid(df):
     return df.crash_month.dropna().between(JAN,DEC).all()
+
+def is_lat_degree_valid(df):
+    return df.latitude_degrees.dropna().between(41,47).all()
 
 def is_week_day_code_limit_valid(df):
     return df.week_day_code.dropna().between(SUNDAY,SATURDAY).all()
@@ -77,19 +81,47 @@ def validateData():
     if not (is_week_day_code_limit_valid(df)):
         raise ValueError("Limit Assertion Failed for week_day_code")
 
+    # Assertion 2.c: When entered, Latitude Degrees must be a whole number between 41 and 47, inclusive
+    if not (is_lat_degree_valid(df)):
+        raise ValueError("Limit Assertion Failed for latitude degree")
+
+    # Asssertion 3: Intra Record Check Assertion
+    # Asssertion 3a: Total Count of Persons Involved = Total Pedestrian Count + Total Pedalcyclist Count + Total Unknown Count + Total Occupant Count.
+    # TODO
+
+    # Assertion 3b: Total Un-Injured Persons Count = total number of persons involved - the number of personsinjured - the number of persons killed
+    # TODO
+    
+    # Asssertion 4: Inter Record Check Assertion
+    # Asssertion 4a: Total crash should not vary more than 50% month on mpnth
+    # TODO
+
+    # Asssertion 4b: Latitude Minutes must be null when Latitude Degrees is null
+    # And Latitude Seconds must be null when Latitude Degrees is null
+    # TODO
+
+    # Distance from Intersection must = 0 when Road Character = 1
+    # And Distance from Intersection must be > 0 when Road Character is not 1
+
+    # Asssertion 5: Summary Assertion
+    # Asssertion 5a: Check if all participant has unique id
     if not (is_all_participant_id_unique(df)):
         raise ValueError("Summary Assertion Failed for unique participant id")
 
+    # Asssertion 5b: TODO
+
+    # Asssertion 6: Referential Integrity Assertion
+    # Asssertion 6a: Each participant id has a crash id
     if not is_all_participant_id_has_crash_id(df):
         raise ValueError("Referential integrity Assertion Failed for participant_id:crash_id")
 
-    print("All validations passed successfully")
+    # Asssertion 6b: Every crash has a known lat long location
+    # TODO
 
-# # Seperate out crash data
-# crash_data = df[df['record_type'] == 1] 
-# # Seperate out vehicle data
-# vehicle_data = df[df['record_type'] == 2]
-# # Seperate out person data
-# person_data = df[df['record_type'] == 3]
+    # Assertion 7: Statistical Distribution Assertion
+    # Assertion 7a: TODO
+    # Assertion 7b: TODO
+
+    print("All validations passed successfully")
 
 validateData()
