@@ -23,7 +23,11 @@ df=df.rename(columns={
     'Crash Day':'crash_day',
     'Crash Year':'crash_year',
     'Week Day Code': 'week_day_code',
-    'Latitude Degrees': 'latitude_degrees'
+    'Latitude Degrees': 'latitude_degrees',
+    'Total Un-Injured Persons': 'total_uninjured_persons_count',
+    'Total Count of Persons Involved': 'total_person_involved_count',
+    'Total Non-Fatal Injury Count': 'total_non_fatal_injury_count',
+    'Total Fatality Count': 'total_fatality_count'
     })
 
 CRASH_RECORD_ID = 1
@@ -72,6 +76,13 @@ def is_all_participant_id_has_crash_id(id):
     # check if there is any null in crash id
     return crash_participant_df.crash_id.isnull().sum() == 0
 
+def is_total_uninjured_count_valid(df):
+    total_uninjured_persons_count=df['total_uninjured_persons_count'].fillna(0)
+    total_person_involved_count=df['total_person_involved_count'].fillna(0)
+    total_non_fatal_injury_count=df['total_non_fatal_injury_count'].fillna(0)
+    total_fatality_count=df['total_fatality_count'].fillna(0)
+    return (total_uninjured_persons_count == total_person_involved_count - (total_non_fatal_injury_count + total_fatality_count)).all()
+
 def validateData():
     # Assertion 1: Existence Assertion
     # Assertion 1.a: All Records must have a record_type and the record_type should be either 1, 2 or 3
@@ -99,8 +110,9 @@ def validateData():
     # Assertion 3a: Total Count of Persons Involved = Total Pedestrian Count + Total Pedalcyclist Count + Total Unknown Count + Total Occupant Count.
     # TODO
 
-    # Assertion 3b: Total Un-Injured Persons Count = total number of persons involved - the number of personsinjured - the number of persons killed
-    # TODO
+    # Assertion 3b: Total Un-Injured Persons Count = total number of persons involved - the number of persons injured - the number of persons killed
+    if not is_total_uninjured_count_valid(df):
+        raise ValueError("Intra Record Assertion failed for Total Un-Injured Persons Count")
     
     # Assertion 4: Inter Record Check Assertion
     # Assertion 4a: Total crash should not vary more than 50% month on mpnth
