@@ -26,3 +26,26 @@ decCases.columns = decCases.columns.droplevel(1)
 
 joinedDf = pd.merge(totalCases, decCases, how='left', on=['county', 'state'])
 print(joinedDf)
+
+
+counties_to_filter = [
+    'Loudoun', #Virginia
+    'Washington', #Oregon, 
+    'Harlan', #Kentucky,
+    'Malheur' #Oregon
+]
+
+states_to_filter = [
+    'Virginia',
+    'Oregon', 
+    'Kentucky',
+    'Oregon'
+]
+
+Filterdf = pd.DataFrame({
+    'county': counties_to_filter,
+    'state': states_to_filter
+})
+
+
+print(pd.merge(Filterdf, joinedDf, how='left', on=['state', 'county']))
