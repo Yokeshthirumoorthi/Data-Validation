@@ -56,3 +56,6 @@ Filterdf = pd.DataFrame({
 })
 
 print(pd.merge(Filterdf, acsDf, how='left', on=['county', 'state']))
+
+def getDataFrame():
+    return acsDf    

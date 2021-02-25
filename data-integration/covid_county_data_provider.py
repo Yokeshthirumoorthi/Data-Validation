@@ -9,6 +9,8 @@ pd.set_option('display.max_rows', 200)
 # nrows is the number of rows of file to read. Its useful for reading pieces of large files
 df = pd.read_csv('data/COVID_county_data.csv', nrows=None)
 
+df['county'] = df['county'] + ' County';
+
 # Print the shape of df rows,columns
 print(df.shape)
 
@@ -29,10 +31,10 @@ print(joinedDf)
 
 
 counties_to_filter = [
-    'Loudoun', #Virginia
-    'Washington', #Oregon, 
-    'Harlan', #Kentucky,
-    'Malheur' #Oregon
+    'Loudoun County', #Virginia
+    'Washington County', #Oregon, 
+    'Harlan County', #Kentucky,
+    'Malheur County' #Oregon
 ]
 
 states_to_filter = [
@@ -49,3 +51,6 @@ Filterdf = pd.DataFrame({
 
 
 print(pd.merge(Filterdf, joinedDf, how='left', on=['state', 'county']))
+
+def getDataFrame():
+    return joinedDf    
