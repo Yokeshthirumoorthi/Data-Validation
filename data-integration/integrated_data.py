@@ -41,16 +41,27 @@ def get_corrs(dataframe):
     corrs_deaths_poverty = df.total_deaths_normalized.corr(df.poverty)
     corrs_deaths_ipc = df.total_deaths_normalized.corr(df.income_per_capita)
 
+    df['dec_cases_normalized'] = (df.dec_cases * 100000) / df.population
+    corrs_dec_cases_poverty = df.dec_cases_normalized.corr(df.poverty)
+    corrs_dec_cases_ipc = df.dec_cases_normalized.corr(df.income_per_capita)
+
+    df['dec_deaths_normalized'] = (df.dec_deaths * 100000) / df.population
+    corrs_dec_deaths_poverty = df.dec_deaths_normalized.corr(df.poverty)
+    corrs_dec_deaths_ipc = df.dec_deaths_normalized.corr(df.income_per_capita)
+
     corrs_df = pd.DataFrame({
         'corrs_cases_poverty': [corrs_cases_poverty],
         'corrs_cases_ipc': [corrs_cases_ipc],
         'corrs_deaths_poverty': [corrs_deaths_poverty],
-        'corrs_deaths_ipc': [corrs_deaths_ipc]
+        'corrs_deaths_ipc': [corrs_deaths_ipc],
+        'corrs_dec_cases_poverty':[corrs_dec_cases_poverty],
+        'corrs_dec_cases_ipc':[corrs_dec_cases_ipc],
+        'corrs_dec_deaths_poverty':[corrs_dec_deaths_poverty],
+        'corrs_dec_deaths_ipc':[corrs_dec_deaths_ipc]
     })
 
     return corrs_df
     
-
 def print_results():
     acs_df = acs.getDataFrame()
     covid_df = covid.getDataFrame()
@@ -66,6 +77,7 @@ def print_results():
 
     print(acs_selected_counties_subset_df)
     print(covid_selected_counties_subset_df)
+    print(Oregon_df)
     print(corrs_usa_df)
     print(corrs_oregon_df)
 
