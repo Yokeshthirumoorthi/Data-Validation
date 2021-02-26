@@ -1,16 +1,18 @@
 #!/usr/bin/env python
+
+# Copyright © 2021 Yokesh Thirumoorthi
+# [This program is licensed under the "MIT License"]
+# Please see the file LICENSE in the source
+# distribution of this software for license terms.
+
 import pandas as pd
 
-pd.set_option('display.width', 200)
-pd.set_option('display.max_columns', 35)
-pd.set_option('display.max_rows', 200)
-
+# Import acs census data
 # nrows : int, default None
 # nrows is the number of rows of file to read. Its useful for reading pieces of large files
 df = pd.read_csv('data/acs2017_census_tract_data.csv', nrows=None)
 
-
-# Renaming few columns of interest
+# Renaming few column
 df=df.rename(columns={
     'State':'state',
     'County':'county',
@@ -19,43 +21,46 @@ df=df.rename(columns={
     'Poverty':'poverty'
     })
 
+# Retain only the required columns and ignore the rest
 df=pd.DataFrame(df, columns=['state', 'county', 'population', 'income', 'poverty'])
 
 # Print the shape of df rows,columns
 print(df.shape)
-df['poverty_count'] = df['population'] * df['poverty'] / 100
 
-aggdict = {'population':['sum'], 'income':['sum'], 'poverty_count':['sum']}
-columnNames = {'income': 'income', 'population': 'population', 'poverty_count': 'poverty_count'}
-acsDf = df.groupby(['county', 'state']) \
-        .agg(aggdict) \
-        .rename(columns=columnNames) \
-        .reset_index()
+def compute_poverty_population(df):
+    return (df.population * df.poverty) / 100
 
-acsDf.columns = acsDf.columns.droplevel(1)
-acsDf['income_per_capita'] = acsDf['income'] + acsDf['population']
-acsDf['poverty'] = acsDf['poverty_count'] / acsDf['population']
+# Poverty is givan in % for each tract, which could not be summed up while using groupby. 
+# So create a new column: Povery population = (population * povety_percent) / 100'
+def get_poverty_transformed_df(df):
+    poverty_transformed_df = pd.DataFrame(df)
+    poverty_transformed_df['poverty_population'] = compute_poverty_population(df)
+    return poverty_transformed_df
 
-counties_to_filter = [
-    'Loudoun County', #Virginia
-    'Washington County', #Oregon, 
-    'Harlan County', #Kentucky,
-    'Malheur County' #Oregon
-]
+# Groupby County and State. 
+# Get total for population, income and poverty_population
+def get_acs_df(df):    
+    aggDict = {'population':['sum'], 'income':['sum'], 'poverty_population':['sum']}
+    columnNames = {'income': 'income', 'population': 'population', 'poverty_population': 'poverty_population'}
+    acs_df = df.groupby(['county', 'state']) \
+            .agg(aggDict) \
+            .rename(columns=columnNames) \
+            .reset_index() 
+    
+    #  Get rid of the count subtables inside agrregated columns
+    acs_df.columns = acs_df.columns.droplevel(1)
 
-states_to_filter = [
-    'Virginia',
-    'Oregon', 
-    'Kentucky',
-    'Oregon'
-]
+    # Recalculate ipc for groiped data
+    acs_df['income_per_capita'] = acs_df.income + acs_df.population
+    # show povery as percentage
+    acs_df['poverty'] = acs_df.poverty_population / acs_df.population
+    # Povery population is no more required. Delete it.
+    del df['poverty_population']
 
-Filterdf = pd.DataFrame({
-    'state': states_to_filter,
-    'county': counties_to_filter
-})
-
-print(pd.merge(Filterdf, acsDf, how='left', on=['county', 'state']))
+    return acs_df
 
 def getDataFrame():
-    return acsDf    
+    poverty_transformed_df = get_poverty_transformed_df(df)
+    acs_df = get_acs_df(poverty_transformed_df)
+
+    return acs_df    
